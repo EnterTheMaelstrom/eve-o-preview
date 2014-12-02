@@ -50,7 +50,7 @@ namespace PreviewToy
         //New Thread
         private void labelCompanyName_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
         {
-            string url = "https://forums.eveonline.com/default.aspx?g=posts&t=246157";
+            string url = "https://forums.eveonline.com/default.aspx?g=posts&m=5264866";
             ProcessStartInfo sInfo = new ProcessStartInfo(new Uri(url).AbsoluteUri);
             Process.Start(sInfo);
         }

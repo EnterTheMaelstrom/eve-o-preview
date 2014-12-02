@@ -55,14 +55,14 @@
     </dependentAssembly>
   </dependency>
   <dependency>
-    <dependentAssembly dependencyType="install" allowDelayedBinding="true" codebase="eve-o preview.exe" size="150016">
+    <dependentAssembly dependencyType="install" allowDelayedBinding="true" codebase="eve-o preview.exe" size="150528">
       <assemblyIdentity name="eve-o preview" version="1.15.0.0" language="neutral" processorArchitecture="msil" />
       <hash>
         <dsig:Transforms>
           <dsig:Transform Algorithm="urn:schemas-microsoft-com:HashTransforms.Identity" />
         </dsig:Transforms>
         <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha256" />
-        <dsig:DigestValue>ahOW7W0pPmyEAG7BchLRDz202Bqi3hB9Ac4bCFvwWXw=</dsig:DigestValue>
+        <dsig:DigestValue>vwODvaIIzKXsVPnJcoa3NG+mCtRMB8IWSbFNQ+58ELw=</dsig:DigestValue>
       </hash>
     </dependentAssembly>
   </dependency>
