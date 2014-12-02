@@ -186,7 +186,12 @@ namespace PreviewToy
         {
             if (has_been_set_up)
             {
-                if (DwmApi.DwmIsCompositionEnabled())
+                if (!DwmApi.IsWindow(this.sourceWindow))
+                {
+                    has_been_set_up = false;
+                    return;
+                }
+                else if (DwmApi.DwmIsCompositionEnabled())
                 {
                     if (thumbnail_has_been_set_up == false)
                     {

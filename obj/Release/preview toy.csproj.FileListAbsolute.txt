@@ -1,0 +1,17 @@
+C:\Users\Philip\Documents\GitHub\eve-o-preview\bin\Release\eve-o preview.exe.config
+C:\Users\Philip\Documents\GitHub\eve-o-preview\bin\Release\eve-o preview.exe.manifest
+C:\Users\Philip\Documents\GitHub\eve-o-preview\bin\Release\eve-o preview.application
+C:\Users\Philip\Documents\GitHub\eve-o-preview\bin\Release\eve-o preview.exe
+C:\Users\Philip\Documents\GitHub\eve-o-preview\bin\Release\eve-o preview.pdb
+C:\Users\Philip\Documents\GitHub\eve-o-preview\obj\Release\preview toy.csprojResolveAssemblyReference.cache
+C:\Users\Philip\Documents\GitHub\eve-o-preview\obj\Release\PreviewToy.PreviewToyHandler.resources
+C:\Users\Philip\Documents\GitHub\eve-o-preview\obj\Release\PreviewToy.PreviewOverlay.resources
+C:\Users\Philip\Documents\GitHub\eve-o-preview\obj\Release\PreviewToy.Properties.Resources.resources
+C:\Users\Philip\Documents\GitHub\eve-o-preview\obj\Release\PreviewToy.Preview.resources
+C:\Users\Philip\Documents\GitHub\eve-o-preview\obj\Release\preview toy.csproj.GenerateResource.Cache
+C:\Users\Philip\Documents\GitHub\eve-o-preview\obj\Release\eve-o preview.TrustInfo.xml
+C:\Users\Philip\Documents\GitHub\eve-o-preview\obj\Release\eve-o preview.exe.manifest
+C:\Users\Philip\Documents\GitHub\eve-o-preview\obj\Release\eve-o preview.application
+C:\Users\Philip\Documents\GitHub\eve-o-preview\obj\Release\eve-o preview.exe
+C:\Users\Philip\Documents\GitHub\eve-o-preview\obj\Release\eve-o preview.pdb
+C:\Users\Philip\Documents\GitHub\eve-o-preview\obj\Release\PreviewToy.AboutBox.resources

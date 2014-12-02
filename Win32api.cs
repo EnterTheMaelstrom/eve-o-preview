@@ -15,6 +15,10 @@ namespace PreviewToy
         [DllImport("user32.dll")]
         public static extern bool SetForegroundWindow(IntPtr window);
 
+        [DllImport("user32.dll")]
+        [return: MarshalAs(UnmanagedType.Bool)]
+        public static extern bool IsWindow(IntPtr hWnd);
+
         [DllImport("dwmapi.dll", PreserveSig = false)]
         public static extern void DwmEnableBlurBehindWindow(IntPtr hWnd, DWM_BLURBEHIND pBlurBehind);
 
@@ -43,7 +47,7 @@ namespace PreviewToy
 
         [DllImport("dwmapi.dll", PreserveSig = false)]
         public static extern void DwmQueryThumbnailSourceSize(IntPtr hThumbnail, out Size size);
-        
+
         [StructLayout(LayoutKind.Sequential)]
         public class DWM_THUMBNAIL_PROPERTIES
         {

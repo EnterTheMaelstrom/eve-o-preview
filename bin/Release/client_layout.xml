@@ -1,0 +1,15 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<client_layout>
+  <EVE_-_Makari_Aeron>
+    <x>86</x>
+    <y>20</y>
+    <width>1764</width>
+    <height>1014</height>
+  </EVE_-_Makari_Aeron>
+  <EVE>
+    <x>86</x>
+    <y>20</y>
+    <width>1764</width>
+    <height>1014</height>
+  </EVE>
+</client_layout>

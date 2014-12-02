@@ -691,9 +691,8 @@ namespace PreviewToy
 
         private void linkLabel1_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
         {
-            string url = "https://forums.eveonline.com/default.aspx?g=posts&t=246157";
-            ProcessStartInfo sInfo = new ProcessStartInfo(new Uri(url).AbsoluteUri);
-            Process.Start(sInfo);
+            AboutBox aboutBox = new AboutBox();
+            aboutBox.Show();
         }
 
 

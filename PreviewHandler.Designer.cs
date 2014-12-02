@@ -72,7 +72,6 @@ namespace PreviewToy
             this.label1 = new System.Windows.Forms.Label();
             this.panel4 = new System.Windows.Forms.Panel();
             this.aero_status_label = new System.Windows.Forms.Label();
-            this.label3 = new System.Windows.Forms.Label();
             ((System.ComponentModel.ISupportInitialize)(this.previewToyMainBindingSource)).BeginInit();
             this.flowLayoutPanel1.SuspendLayout();
             this.panel1.SuspendLayout();
@@ -168,10 +167,10 @@ namespace PreviewToy
             this.forum_url.AutoSize = true;
             this.forum_url.Location = new System.Drawing.Point(143, 4);
             this.forum_url.Name = "forum_url";
-            this.forum_url.Size = new System.Drawing.Size(94, 13);
+            this.forum_url.Size = new System.Drawing.Size(100, 13);
             this.forum_url.TabIndex = 10;
             this.forum_url.TabStop = true;
-            this.forum_url.Text = "Made by StinkRay";
+            this.forum_url.Text = "About This Program";
             this.forum_url.LinkClicked += new System.Windows.Forms.LinkLabelLinkClickedEventHandler(this.linkLabel1_LinkClicked);
             // 
             // previewToyMainBindingSource
@@ -345,7 +344,7 @@ namespace PreviewToy
             this.flowLayoutPanel1.Dock = System.Windows.Forms.DockStyle.Fill;
             this.flowLayoutPanel1.Location = new System.Drawing.Point(0, 0);
             this.flowLayoutPanel1.Name = "flowLayoutPanel1";
-            this.flowLayoutPanel1.Size = new System.Drawing.Size(252, 394);
+            this.flowLayoutPanel1.Size = new System.Drawing.Size(252, 371);
             this.flowLayoutPanel1.TabIndex = 25;
             this.flowLayoutPanel1.Paint += new System.Windows.Forms.PaintEventHandler(this.flowLayoutPanel1_Paint);
             // 
@@ -446,7 +445,6 @@ namespace PreviewToy
             // 
             // panel4
             // 
-            this.panel4.Controls.Add(this.label3);
             this.panel4.Controls.Add(this.aero_status_label);
             this.panel4.Controls.Add(this.forum_url);
             this.panel4.Location = new System.Drawing.Point(3, 347);
@@ -463,20 +461,11 @@ namespace PreviewToy
             this.aero_status_label.TabIndex = 0;
             this.aero_status_label.Text = "label4";
             // 
-            // label3
-            // 
-            this.label3.AutoSize = true;
-            this.label3.Location = new System.Drawing.Point(16, 23);
-            this.label3.Name = "label3";
-            this.label3.Size = new System.Drawing.Size(214, 13);
-            this.label3.TabIndex = 11;
-            this.label3.Text = "Updated by CCP FoxFour and Makari Aeron";
-            // 
             // PreviewToyHandler
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(252, 394);
+            this.ClientSize = new System.Drawing.Size(252, 371);
             this.Controls.Add(this.flowLayoutPanel1);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.Fixed3D;
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
@@ -540,7 +529,6 @@ namespace PreviewToy
         private Label aero_status_label;
         private Panel panel5;
         private CheckBox option_track_client_windows;
-        private Label label3;
 
 
     }
