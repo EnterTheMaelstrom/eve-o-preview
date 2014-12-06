@@ -1,18 +1,18 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.Drawing;
 using System.Drawing.Drawing2D;
+using System.Drawing.Text;
+using System.IO;
+using System.Linq;
+using System.Reflection;
+using System.Runtime.InteropServices;
 using System.Text;
 using System.Windows.Forms;
-using System.Runtime.InteropServices;
-using System.Diagnostics;
-using System.Drawing.Text;
 using System.Windows.Threading;
 using System.Xml.Linq;
-using System.Linq;
-
-using System.IO;
 
 namespace PreviewToy
 {
@@ -113,6 +113,16 @@ namespace PreviewToy
         private void GlassForm_Load(object sender, EventArgs e)
         {
             refresh_thumbnails();
+            this.Resize += PreviewToyHandler_Resize;
+            label_version.Text = Assembly.GetExecutingAssembly().GetName().Version.ToString();
+        }
+
+        void PreviewToyHandler_Resize(object sender, EventArgs e)
+        {
+            if (FormWindowState.Minimized == this.WindowState && checkBox_toTray.Checked)
+            {
+                this.Hide();
+            }
         }
 
 
@@ -147,6 +157,8 @@ namespace PreviewToy
             option_show_overlay.Checked = Properties.Settings.Default.show_overlay;
 
             option_track_client_windows.Checked = Properties.Settings.Default.track_client_windows;
+
+            checkBox_toTray.Checked = Properties.Settings.Default.toTray;
 
             // disable/enable zoom suboptions
             option_zoom_factor.Enabled = Properties.Settings.Default.zoom_on_hover;
@@ -784,6 +796,17 @@ namespace PreviewToy
             Properties.Settings.Default.track_client_windows = option_track_client_windows.Checked;
             Properties.Settings.Default.Save();
             refresh_thumbnails();
+        }
+
+        private void checkBox_toTray_CheckedChanged(object sender, EventArgs e)
+        {
+            Properties.Settings.Default.toTray = checkBox_toTray.Checked;
+            Properties.Settings.Default.Save();
+        }
+
+        private void notifyIcon_MouseDoubleClick(object sender, MouseEventArgs e)
+        {
+            this.Show();
         }
 
     }

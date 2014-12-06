@@ -202,5 +202,17 @@ namespace PreviewToy.Properties {
                 this["track_client_windows"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool toTray {
+            get {
+                return ((bool)(this["toTray"]));
+            }
+            set {
+                this["toTray"] = value;
+            }
+        }
     }
 }
