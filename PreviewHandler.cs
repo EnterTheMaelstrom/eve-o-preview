@@ -25,8 +25,8 @@ namespace PreviewToy
         private IntPtr active_client_handle = (IntPtr)0;
         private String active_client_title = "";
 
-        private Dictionary<String, Dictionary<String, Point>> unique_layouts;
-        private Dictionary<String, Point> flat_layout;
+        private Dictionary<String, Dictionary<String, ClientLocation>> unique_layouts;
+        private Dictionary<String, ClientLocation> flat_layout;
         private Dictionary<String, ClientLocation> client_layout;
 
         private bool is_initialized;
@@ -49,7 +49,7 @@ namespace PreviewToy
             public int Bottom;
         }
 
-        private struct ClientLocation
+        public struct ClientLocation
         {
             public int X;
             public int Y;
@@ -87,8 +87,8 @@ namespace PreviewToy
             xml_bad_to_ok_chars[","] = "---comma---";
             xml_bad_to_ok_chars["."] = "---dot---";
 
-            unique_layouts = new Dictionary<String, Dictionary<String, Point>>();
-            flat_layout = new Dictionary<String, Point>();
+            unique_layouts = new Dictionary<String, Dictionary<String, ClientLocation>>();
+            flat_layout = new Dictionary<String, ClientLocation>();
             client_layout = new Dictionary<String, ClientLocation>();
 
             ignoring_size_sync = new Stopwatch();
@@ -187,11 +187,15 @@ namespace PreviewToy
                 Size sync_size = new Size();
                 sync_size.Width = (int)Properties.Settings.Default.sync_resize_x;
                 sync_size.Height = (int)Properties.Settings.Default.sync_resize_y;
+                Size size_to_use = sync_size;
 
                 if (!previews.ContainsKey(process.MainWindowHandle) && process.MainWindowTitle != "")
                 {
-                    previews[process.MainWindowHandle] = new Preview(process.MainWindowHandle, "...", this, sync_size);
-                    previews[process.MainWindowHandle].set_render_area_size(sync_size);
+                  if (flat_layout.ContainsKey(process.MainWindowTitle)) {
+                    size_to_use = new Size(flat_layout[process.MainWindowTitle].Width, flat_layout[process.MainWindowTitle].Height);
+                  }
+                  previews[process.MainWindowHandle] = new Preview(process.MainWindowHandle, "...", this, size_to_use);
+                  previews[process.MainWindowHandle].set_render_area_size(size_to_use);
  
                     // apply more thumbnail specific options
                     previews[process.MainWindowHandle].MakeTopMost(Properties.Settings.Default.always_on_top);
@@ -294,10 +298,16 @@ namespace PreviewToy
                 XElement rootElement = XElement.Load("layout.xml");
                 foreach (var el in rootElement.Elements())
                 {
-                    Dictionary<String, Point> inner = new Dictionary<String, Point>();
+                    Dictionary<String, ClientLocation> inner = new Dictionary<String, ClientLocation>();
                     foreach (var inner_el in el.Elements())
                     {
-                        inner[ParseXElement(inner_el)] = new Point(Convert.ToInt32(inner_el.Element("x").Value), Convert.ToInt32(inner_el.Element("y").Value));
+                      ClientLocation clientLocation = new ClientLocation();
+                      clientLocation.X = Convert.ToInt32(inner_el.Element("x").Value);
+                      clientLocation.Y = Convert.ToInt32(inner_el.Element("y").Value);
+                      clientLocation.Width = (inner_el.Element("width") == null ? 124 : Convert.ToInt32(inner_el.Element("width").Value));
+                      clientLocation.Height = (inner_el.Element("height") == null ? 124 : Convert.ToInt32(inner_el.Element("height").Value));
+
+                      inner[ParseXElement(inner_el)] = clientLocation;
                     }
                     unique_layouts[ParseXElement(el)] = inner;
                 }
@@ -308,7 +318,13 @@ namespace PreviewToy
                 XElement rootElement = XElement.Load("flat_layout.xml");
                 foreach (var el in rootElement.Elements())
                 {
-                    flat_layout[ParseXElement(el)] = new Point(Convert.ToInt32(el.Element("x").Value), Convert.ToInt32(el.Element("y").Value));
+                  ClientLocation clientLocation = new ClientLocation();
+                  clientLocation.X = Convert.ToInt32(el.Element("x").Value);
+                  clientLocation.Y = Convert.ToInt32(el.Element("y").Value);
+                  clientLocation.Width = (el.Element("width") == null ? 124 : Convert.ToInt32(el.Element("width").Value));
+                  clientLocation.Height = (el.Element("height") == null ? 124 : Convert.ToInt32(el.Element("height").Value));
+                   
+                  flat_layout[ParseXElement(el)] = clientLocation;
                 }
             }
 
@@ -348,6 +364,8 @@ namespace PreviewToy
                     XElement position = MakeXElement(thumbnail);
                     position.Add(new XElement("x", thumbnail_.Value.X));
                     position.Add(new XElement("y", thumbnail_.Value.Y));
+                    position.Add(new XElement("width", thumbnail_.Value.Width));
+                    position.Add(new XElement("height", thumbnail_.Value.Height));
                     layout.Add(position);
                 }
                 el.Add(layout);
@@ -365,6 +383,8 @@ namespace PreviewToy
                 XElement layout = MakeXElement(clientKV.Key);
                 layout.Add(new XElement("x", clientKV.Value.X));
                 layout.Add(new XElement("y", clientKV.Value.Y));
+                layout.Add(new XElement("width", clientKV.Value.Width));
+                layout.Add(new XElement("height", clientKV.Value.Height));
                 el2.Add(layout);
             }
 
@@ -390,25 +410,36 @@ namespace PreviewToy
 
         private void handle_unique_layout(Preview preview, String last_known_active_window)
         {
-            Dictionary<String, Point> layout;
+            Dictionary<String, ClientLocation> layout;
             if (unique_layouts.TryGetValue(last_known_active_window, out layout))
             {
-                Point new_loc;
+              ClientLocation new_loc;
                 if ( Properties.Settings.Default.unique_layout && layout.TryGetValue(preview.Text, out new_loc))
                 {
-                    preview.doMove(new_loc);
+                  preview.doMove(new_loc);
                 }
                 else
                 {
                     // create inner dict
-                    layout[preview.Text] = preview.Location;
+                  ClientLocation clientLocation = new ClientLocation();
+                  clientLocation.X = preview.Location.X;
+                  clientLocation.Y = preview.Location.Y;
+                  clientLocation.Width = preview.Size.Width;
+                  clientLocation.Height = preview.Size.Height;
+                  layout[preview.Text] = clientLocation;
                 }
             }
             else if (last_known_active_window != "")
             {
                 // create outer dict
-                unique_layouts[last_known_active_window] = new Dictionary<String, Point>();
-                unique_layouts[last_known_active_window][preview.Text] = preview.Location;
+              ClientLocation clientLocation = new ClientLocation();
+              clientLocation.X = preview.Location.X;
+              clientLocation.Y = preview.Location.Y;
+              clientLocation.Width = preview.Size.Width;
+              clientLocation.Height = preview.Size.Height;
+              
+              unique_layouts[last_known_active_window] = new Dictionary<String, ClientLocation>();
+              unique_layouts[last_known_active_window][preview.Text] = clientLocation;
             }
         }
 
@@ -456,14 +487,21 @@ namespace PreviewToy
 
         private void handle_flat_layout(Preview preview)
         {
-            Point layout;
+            ClientLocation layout;
             if (flat_layout.TryGetValue(preview.Text, out layout))
             {
                  preview.doMove( layout );
             }
             else if (preview.Text != "")
             {
-                flat_layout[preview.Text] = preview.Location;
+              ClientLocation clientLocation = new ClientLocation();
+              clientLocation.X = preview.Location.X;
+              clientLocation.Y = preview.Location.Y;
+              clientLocation.Width = preview.Width;
+              clientLocation.Height = preview.Height;
+
+              flat_layout[preview.Text] = clientLocation;
+                store_layout();
             }
         }
 
@@ -543,27 +581,43 @@ namespace PreviewToy
         }
 
 
-        public void register_preview_position(String preview_title, Point position)
+        public void register_preview_position(String preview_title, Point position, Size size)
         {
             
             if (Properties.Settings.Default.unique_layout)
             {
-                Dictionary<String, Point> layout;
+              Dictionary<String, ClientLocation> layout;
                 if (unique_layouts.TryGetValue(active_client_title, out layout))
                 {
-                    layout[preview_title] = position;
+                  ClientLocation clientLocation = new ClientLocation();
+                  clientLocation.X = position.X;
+                  clientLocation.Y = position.Y;
+                  clientLocation.Width = size.Width;
+                  clientLocation.Height = size.Height;
+                  layout[preview_title] = clientLocation;
                 }
                 else if (active_client_title == "")
                 {
-                    unique_layouts[active_client_title] = new Dictionary<String, Point>();
-                    unique_layouts[active_client_title][preview_title] = position;
+                    unique_layouts[active_client_title] = new Dictionary<String, ClientLocation>();
+                    ClientLocation clientLocation = new ClientLocation();
+                    clientLocation.X = position.X;
+                    clientLocation.Y = position.Y;
+                    clientLocation.Width = size.Width;
+                    clientLocation.Height = size.Height;
+
+                    unique_layouts[active_client_title][preview_title] = clientLocation;
                 }
             }
             else
             {
-                flat_layout[preview_title] = position;
+              ClientLocation clientLocation = new ClientLocation();
+              clientLocation.X = position.X;
+              clientLocation.Y = position.Y;
+              clientLocation.Width = size.Width;
+              clientLocation.Height = size.Height;
+              flat_layout[preview_title] = clientLocation;
             }
-             
+            store_layout();
         }
 
 

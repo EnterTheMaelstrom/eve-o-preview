@@ -155,23 +155,30 @@ namespace PreviewToy
         {
             RefreshPreview();
             base.OnResize(e);
-            if (has_been_set_up && !mouse_over_lock)
-                this.spawner.syncronize_preview_size(this.Size);
+            if (has_been_set_up && !mouse_over_lock) {
+              this.spawner.syncronize_preview_size(this.Size);
+              this.spawner.register_preview_position(this.Text, this.Location, this.Size);
+            }
         }
 
         protected override void OnMove(EventArgs e)
         {
             base.OnMove(e);
             if (has_been_set_up && !mouse_over_lock)
-                this.spawner.register_preview_position(this.Text, this.Location);
+                this.spawner.register_preview_position(this.Text, this.Location, this.Size);
 
             RefreshPreview();
         }
 
-        public void doMove(Point position)
+        public void doMove(PreviewToy.PreviewToyHandler.ClientLocation loc) {
+          doMove(new Point(loc.X, loc.Y), new Size(loc.Width, loc.Height));
+        }
+        public void doMove(Point position, Size size)
         {
-            if (has_been_set_up && !mouse_over_lock)
-                Location = position;
+          if (has_been_set_up && !mouse_over_lock) {
+            Location = position;
+            Size = size;
+          }
 
             RefreshPreview();
         }
