@@ -1,2 +1,18 @@
 # Ignore /bin/ #
 bin/
+obj/Debug/eve-o preview.application
+obj/Debug/eve-o preview.exe
+obj/Debug/eve-o preview.exe.manifest
+obj/Debug/eve-o preview.pdb
+obj/Debug/eve-o preview.TrustInfo.xml
+obj/Debug/preview toy.csproj.FileListAbsolute.txt
+obj/Debug/preview toy.csproj.GenerateResource.Cache
+obj/Debug/preview toy.csprojResolveAssemblyReference.cache
+obj/Debug/PreviewToy.AboutBox.resources
+obj/Debug/PreviewToy.Preview.resources
+obj/Debug/PreviewToy.PreviewOverlay.resources
+obj/Debug/PreviewToy.PreviewToyHandler.resources
+obj/Debug/PreviewToy.Properties.Resources.resources
+obj/Debug/TemporaryGeneratedFile_036C0B5B-1481-4323-8D20-8F5ADCB23D92.cs
+obj/Debug/TemporaryGeneratedFile_5937a670-0e60-4077-877b-f7221da3dda1.cs
+obj/Debug/TemporaryGeneratedFile_E7A71F73-0F8D-4B9B-B56E-8E70B10BC5D3.cs
