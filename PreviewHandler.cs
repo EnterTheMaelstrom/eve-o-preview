@@ -280,7 +280,7 @@ namespace PreviewToy {
       load_client_layout("client_layout.xml");
     }
 
-    private void load_client_layout(string FileName = "layout.xml") {
+    private void load_client_layout(string FileName = "client_layout.xml") {
       if (!File.Exists(FileName)) {
         return;
       }
