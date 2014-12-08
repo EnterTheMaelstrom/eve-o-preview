@@ -288,7 +288,7 @@ namespace PreviewToy {
       XElement docElement = XElement.Load(FileName);
       XElement rootElement = docElement.Elements().Where(r => r.Attribute("machine") != null && r.Attribute("machine").Value == Environment.MachineName).FirstOrDefault();
       if (rootElement == null) {
-        rootElement = docElement;
+        return;
       }
 
       foreach (var el in rootElement.Elements()) {
@@ -309,7 +309,7 @@ namespace PreviewToy {
       XElement docElement = XElement.Load(FileName);
       XElement rootElement = docElement.Elements().Where(r => r.Attribute("machine") != null && r.Attribute("machine").Value == Environment.MachineName).FirstOrDefault();
       if (rootElement == null) {
-        rootElement = docElement;
+        return;
       }
 
       foreach (var el in rootElement.Elements()) {
@@ -330,7 +330,7 @@ namespace PreviewToy {
       XElement docElement = XElement.Load(FileName);
       XElement rootElement = docElement.Elements().Where(r => r.Attribute("machine") != null && r.Attribute("machine").Value == Environment.MachineName).FirstOrDefault();
       if (rootElement == null) {
-        rootElement = docElement;
+        return;
       }
 
       foreach (var el in rootElement.Elements()) {
