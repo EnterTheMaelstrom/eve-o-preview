@@ -24,3 +24,4 @@ obj/Release/DesignTimeResolveAssemblyReferencesInput.cache
 UpgradeLog.htm
 bin/Release/eve-o preview.application
 bin/Release/eve-o preview.exe
+*.htm

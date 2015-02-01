@@ -9,6 +9,7 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.InteropServices;
+using System.Security.Cryptography;
 using System.Text;
 using System.Windows.Forms;
 using System.Windows.Threading;
@@ -21,11 +22,12 @@ namespace PreviewToy {
     private DispatcherTimer dispatcherTimer;
 
     private IntPtr active_client_handle = (IntPtr)0;
-    private String active_client_title = "";
+    private String active_client_identifier = "";
 
     private Dictionary<String, Dictionary<String, ClientLocation>> unique_layouts;
     private Dictionary<String, ClientLocation> flat_layout;
     private Dictionary<String, ClientLocation> client_layout;
+    private List<String> has_been_setup;
 
     private bool is_initialized;
 
@@ -71,6 +73,7 @@ namespace PreviewToy {
       is_initialized = false;
 
       previews = new Dictionary<IntPtr, Preview>();
+      has_been_setup = new List<string>();
 
       xml_bad_to_ok_chars = new Dictionary<string, string>();
       xml_bad_to_ok_chars["<"] = "---lt---";
@@ -80,6 +83,9 @@ namespace PreviewToy {
       xml_bad_to_ok_chars["\'"] = "---apos---";
       xml_bad_to_ok_chars[","] = "---comma---";
       xml_bad_to_ok_chars["."] = "---dot---";
+      xml_bad_to_ok_chars[":"] = "---colon---";
+      xml_bad_to_ok_chars["\\"] = "---slash---";
+      xml_bad_to_ok_chars[" "] = "_";
 
       unique_layouts = new Dictionary<String, Dictionary<String, ClientLocation>>();
       flat_layout = new Dictionary<String, ClientLocation>();
@@ -159,12 +165,35 @@ namespace PreviewToy {
       load_layout();
     }
 
+    static string GetMd5Hash(string input) {
+      // Convert the input string to a byte array and compute the hash.
+      MD5 md5Hash = MD5.Create();
+      byte[] data = md5Hash.ComputeHash(Encoding.UTF8.GetBytes(input));
+
+      // Create a new Stringbuilder to collect the bytes
+      // and create a string.
+      StringBuilder sBuilder = new StringBuilder();
+
+      // Loop through each byte of the hashed data 
+      // and format each one as a hexadecimal string.
+      for (int i = 0; i < data.Length; i++) {
+        sBuilder.Append(data[i].ToString("x2"));
+      }
+
+      // Return the hexadecimal string.
+      return sBuilder.ToString();
+    }
+
+    private String GetProcessIdentifier(Process proc) {
+      //return proc.MainWindowTitle;
+      //return remove_nonconform_xml_characters(proc.MainModule.FileName);
+      return GetMd5Hash(proc.MainModule.FileName);
+    }
 
     private void spawn_and_kill_previews() {
       if (!is_initialized) { return; }
 
       //Process[] processes = Process.GetProcessesByName("ExeFile");
-      //Process[] processes2 = 
       List<Process> processes = new List<Process>();
       processes.AddRange(Process.GetProcessesByName("ExeFile"));
       processes.AddRange(Process.GetProcessesByName("firefox"));
@@ -173,7 +202,6 @@ namespace PreviewToy {
       List<IntPtr> processHandles = new List<IntPtr>();
 
       // pop new previews
-
       foreach (Process process in processes) {
         processHandles.Add(process.MainWindowHandle);
 
@@ -182,11 +210,13 @@ namespace PreviewToy {
         sync_size.Height = (int)Properties.Settings.Default.sync_resize_y;
         Size size_to_use = sync_size;
 
+        String ProcessIdentifier = GetProcessIdentifier(process);
+
         if (!previews.ContainsKey(process.MainWindowHandle) && process.MainWindowTitle != "") {
-          if (flat_layout.ContainsKey(process.MainWindowTitle)) {
-            size_to_use = new Size(flat_layout[process.MainWindowTitle].Width, flat_layout[process.MainWindowTitle].Height);
+          if (flat_layout.ContainsKey(ProcessIdentifier)) {
+            size_to_use = new Size(flat_layout[ProcessIdentifier].Width, flat_layout[ProcessIdentifier].Height);
           }
-          previews[process.MainWindowHandle] = new Preview(process.MainWindowHandle, "...", this, size_to_use);
+          previews[process.MainWindowHandle] = new Preview(process.MainWindowHandle, process.MainWindowTitle, this, size_to_use, ProcessIdentifier);
           previews[process.MainWindowHandle].set_render_area_size(size_to_use);
 
           // apply more thumbnail specific options
@@ -200,15 +230,18 @@ namespace PreviewToy {
           previews_check_listbox.EndUpdate();
 
           refresh_client_window_locations(process);
-        } else if (previews.ContainsKey(process.MainWindowHandle) && process.MainWindowTitle != previews[process.MainWindowHandle].Text) //or update the preview titles
-                {
+          if (!has_been_setup.Contains(ProcessIdentifier)) {
+            has_been_setup.Add(ProcessIdentifier);
+          }
+        } else if (previews.ContainsKey(process.MainWindowHandle) && ProcessIdentifier != previews[process.MainWindowHandle].OwnProcessIdentifier) {
+          //or update the preview titles
           previews[process.MainWindowHandle].SetLabel(process.MainWindowTitle);
           refresh_client_window_locations(process);
         }
 
         if (process.MainWindowHandle == DwmApi.GetForegroundWindow()) {
           active_client_handle = process.MainWindowHandle;
-          active_client_title = process.MainWindowTitle;
+          active_client_identifier = ProcessIdentifier;
         }
 
       }
@@ -226,6 +259,8 @@ namespace PreviewToy {
         previews_check_listbox.Items.Remove(previews[processHandle]);
         previews_check_listbox.EndUpdate();
 
+        has_been_setup.Remove(previews[processHandle].OwnProcessIdentifier);
+
         previews[processHandle].Close();
         previews.Remove(processHandle);
       }
@@ -235,18 +270,19 @@ namespace PreviewToy {
     }
 
     private void refresh_client_window_locations(Process process) {
-      if (Properties.Settings.Default.track_client_windows && client_layout.ContainsKey(process.MainWindowTitle)) {
+      String ProcessIdentifier = GetProcessIdentifier(process);
+
+      if (Properties.Settings.Default.track_client_windows && client_layout.ContainsKey(ProcessIdentifier)) {
         MoveWindow(
             process.MainWindowHandle,
-            client_layout[process.MainWindowTitle].X,
-            client_layout[process.MainWindowTitle].Y,
-            client_layout[process.MainWindowTitle].Width,
-            client_layout[process.MainWindowTitle].Height,
+            client_layout[ProcessIdentifier].X,
+            client_layout[ProcessIdentifier].Y,
+            client_layout[ProcessIdentifier].Width,
+            client_layout[ProcessIdentifier].Height,
             true);
       }
     }
-
-
+    
     private string remove_nonconform_xml_characters(string entry) {
       foreach (var kv in xml_bad_to_ok_chars) {
         entry = entry.Replace(kv.Key, kv.Value);
@@ -262,19 +298,19 @@ namespace PreviewToy {
     }
 
     private XElement MakeXElement(string elementName, string attributeName, string input) {
-      string clean = remove_nonconform_xml_characters(elementName).Replace(" ", "_");
+      string clean = remove_nonconform_xml_characters(elementName);
       XElement el = new XElement(clean);
       el.SetAttributeValue(attributeName, input);
       return el;
     }
     private XElement MakeXElement(string input) {
-      string clean = remove_nonconform_xml_characters(input).Replace(" ", "_");
+      string clean = remove_nonconform_xml_characters(input);
       return new XElement(clean);
     }
 
     private string ParseXElement(XElement input, String attributeName = "") {
       if (attributeName == "") {
-        return restore_nonconform_xml_characters(input.Name.ToString()).Replace("_", " ");
+        return restore_nonconform_xml_characters(input.Name.ToString());
       } else {
         return input.Attribute(attributeName).Value;
       }
@@ -498,7 +534,7 @@ namespace PreviewToy {
     
     private void handle_flat_layout(Preview preview) {
       ClientLocation layout;
-      if (flat_layout.TryGetValue(preview.Text, out layout)) {
+      if (flat_layout.TryGetValue(preview.OwnProcessIdentifier, out layout)) {
         preview.doMove(layout);
       } else if (preview.Text != "") {
         ClientLocation clientLocation = new ClientLocation();
@@ -507,7 +543,7 @@ namespace PreviewToy {
         clientLocation.Width = preview.Width;
         clientLocation.Height = preview.Height;
 
-        flat_layout[preview.Text] = clientLocation;
+        flat_layout[preview.OwnProcessIdentifier] = clientLocation;
         store_layout();
       }
     }
@@ -518,6 +554,7 @@ namespace PreviewToy {
       List<IntPtr> processHandles = new List<IntPtr>();
 
       foreach (Process process in processes) {
+        String ProcessIdentifier = GetProcessIdentifier(process);
         Rect rect = new Rect();
         GetWindowRect(process.MainWindowHandle, out rect);
 
@@ -535,8 +572,7 @@ namespace PreviewToy {
         clientLocation.Width = client_width;
         clientLocation.Height = client_height;
 
-
-        client_layout[process.MainWindowTitle] = clientLocation;
+        client_layout[ProcessIdentifier] = clientLocation;
       }
     }
 
@@ -571,7 +607,7 @@ namespace PreviewToy {
         } else {
           entry.Value.Show();
           if (Properties.Settings.Default.unique_layout) {
-            handle_unique_layout(entry.Value, active_client_title);
+            handle_unique_layout(entry.Value, active_client_identifier );
           } else {
             handle_flat_layout(entry.Value);
           }
@@ -604,36 +640,40 @@ namespace PreviewToy {
 
     }
 
-    public void register_preview_position(String preview_title, Point position, Size size) {
+    public void register_preview_position(String preview_identifier, Point position, Size size) {
 
       if (Properties.Settings.Default.unique_layout) {
         Dictionary<String, ClientLocation> layout;
-        if (unique_layouts.TryGetValue(active_client_title, out layout)) {
+        if (unique_layouts.TryGetValue(active_client_identifier, out layout)) {
           ClientLocation clientLocation = new ClientLocation();
           clientLocation.X = position.X;
           clientLocation.Y = position.Y;
           clientLocation.Width = size.Width;
           clientLocation.Height = size.Height;
-          layout[preview_title] = clientLocation;
-        } else if (active_client_title == "") {
-          unique_layouts[active_client_title] = new Dictionary<String, ClientLocation>();
+          layout[preview_identifier] = clientLocation;
+        } else if (active_client_identifier == "") {
+          unique_layouts[active_client_identifier] = new Dictionary<String, ClientLocation>();
           ClientLocation clientLocation = new ClientLocation();
           clientLocation.X = position.X;
           clientLocation.Y = position.Y;
           clientLocation.Width = size.Width;
           clientLocation.Height = size.Height;
 
-          unique_layouts[active_client_title][preview_title] = clientLocation;
+          unique_layouts[active_client_identifier][preview_identifier] = clientLocation;
         }
       } else {
-        ClientLocation clientLocation = new ClientLocation();
-        clientLocation.X = position.X;
-        clientLocation.Y = position.Y;
-        clientLocation.Width = size.Width;
-        clientLocation.Height = size.Height;
-        flat_layout[preview_title] = clientLocation;
+        if (has_been_setup.Contains(preview_identifier)) {
+          ClientLocation clientLocation = new ClientLocation();
+          clientLocation.X = position.X;
+          clientLocation.Y = position.Y;
+          clientLocation.Width = size.Width;
+          clientLocation.Height = size.Height;
+          flat_layout[preview_identifier] = clientLocation;
+        }
       }
-      store_layout();
+      if (has_been_setup.Contains(preview_identifier)) {
+        store_layout();
+      }
     }
 
     private void dispatcherTimer_Tick(object sender, EventArgs e) {

@@ -25,6 +25,7 @@ namespace PreviewToy
         private bool has_been_set_up = false;
         private bool thumbnail_has_been_set_up = false;
         private PreviewToyHandler spawner;
+        public String OwnProcessIdentifier { get; set; }
 
         private bool hide = false;
 
@@ -45,10 +46,11 @@ namespace PreviewToy
             this.TopMost = topmost && !(this.hide);
         }
 
-        public Preview(IntPtr sourceWindow, String title, PreviewToyHandler spawner, Size size) 
+        public Preview(IntPtr sourceWindow, String title, PreviewToyHandler spawner, Size size, String processIdentifier) 
         {
             has_been_set_up = false;
 
+            this.OwnProcessIdentifier = processIdentifier;
             this.sourceWindow = sourceWindow;
             this.spawner = spawner; 
 
@@ -63,7 +65,7 @@ namespace PreviewToy
 
             this.old_size = this.Size;
             this.old_position = this.Location;
-
+          
             has_been_set_up = true;
         }
 
@@ -157,7 +159,7 @@ namespace PreviewToy
             base.OnResize(e);
             if (has_been_set_up && !mouse_over_lock) {
               this.spawner.syncronize_preview_size(this.Size);
-              this.spawner.register_preview_position(this.Text, this.Location, this.Size);
+              this.spawner.register_preview_position(this.OwnProcessIdentifier, this.Location, this.Size);
             }
         }
 
@@ -165,7 +167,7 @@ namespace PreviewToy
         {
             base.OnMove(e);
             if (has_been_set_up && !mouse_over_lock)
-                this.spawner.register_preview_position(this.Text, this.Location, this.Size);
+              this.spawner.register_preview_position(this.OwnProcessIdentifier, this.Location, this.Size);
 
             RefreshPreview();
         }
@@ -279,7 +281,7 @@ namespace PreviewToy
 
         void Preview_FormClosing(object sender, FormClosingEventArgs e)
         {
-            overlay.Close();
+          overlay.Close();
         }
 
         public void bring_client_to_foreground()
