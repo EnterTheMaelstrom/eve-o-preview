@@ -163,7 +163,13 @@ namespace PreviewToy {
     private void spawn_and_kill_previews() {
       if (!is_initialized) { return; }
 
-      Process[] processes = Process.GetProcessesByName("ExeFile");
+      //Process[] processes = Process.GetProcessesByName("ExeFile");
+      //Process[] processes2 = 
+      List<Process> processes = new List<Process>();
+      processes.AddRange(Process.GetProcessesByName("ExeFile"));
+      processes.AddRange(Process.GetProcessesByName("firefox"));
+      processes.AddRange(Process.GetProcessesByName("chrome"));
+
       List<IntPtr> processHandles = new List<IntPtr>();
 
       // pop new previews
@@ -190,6 +196,7 @@ namespace PreviewToy {
           // add a preview also
           previews_check_listbox.BeginUpdate();
           previews_check_listbox.Items.Add(previews[process.MainWindowHandle]);
+          previews_check_listbox.SetItemChecked(previews_check_listbox.Items.Count - 1, !process.ProcessName.Contains("exefile"));
           previews_check_listbox.EndUpdate();
 
           refresh_client_window_locations(process);

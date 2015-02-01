@@ -1,3 +1,24 @@
 # Ignore /bin/ #
 bin/
 obj/
+bin/Release/eve-o preview.application
+bin/Release/eve-o preview.application
+bin/Release/eve-o preview.application
+bin/Release/eve-o preview.exe
+bin/Release/eve-o preview.exe.manifest
+bin/Release/eve-o preview.pdb
+obj/Release/DesignTimeResolveAssemblyReferencesInput.cache
+obj/Release/eve-o preview.application
+obj/Release/eve-o preview.exe
+obj/Release/eve-o preview.exe.manifest
+obj/Release/eve-o preview.pdb
+obj/Release/PreviewToy.Properties.Resources.resources
+obj/Release/preview toy.csprojResolveAssemblyReference.cache
+obj/Release/preview toy.csproj.GenerateResource.Cache
+obj/Release/preview toy.csproj.FileListAbsolute.txt
+obj/Release/eve-o preview.pdb
+obj/Release/eve-o preview.exe.manifest
+obj/Release/eve-o preview.exe
+obj/Release/eve-o preview.application
+obj/Release/DesignTimeResolveAssemblyReferencesInput.cache
+UpgradeLog.htm
